@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html > 
+<head>
+<meta charset="utf-8">
+<title>회원가입</title>
+<link rel="stylesheet" type="text/css" href="/css/style.css" />
+<script >
+function checkPass()
+{
+    var password = document.getElementById('password');
+    var confirm = document.getElementById('confirm');
+
+    var message = document.getElementById('confirmMessage');
+    var goodColor = "#66cc66";
+    var badColor = "#ff6666";
+
+    if(password.value == confirm.value){
+
+        confirm.style.backgroundColor = goodColor;
+        message.style.color = goodColor;
+        message.innerHTML = "비밀번호 일치"
+    }else{
+
+        confirm.style.backgroundColor = badColor;
+        message.style.color = badColor;
+        message.innerHTML = "비밀번호 미일치"
+    }
+}  
+
+</script>
+</head>
+<body>
+<div class="contain">
+	<section id="contents">
+		<form method="post">
+			<h1>회원가입</h1>
+			<div>
+				<input type="text" placeholder="Your username" required="" name="username" id="username" />
+			</div>
+			<div>
+				<input type="email" placeholder="Your email" required="" name="email" id="email"/>
+			</div>
+			<div>
+				<input type="password" placeholder="Your password" required="" name="password" id="password" />
+			</div>
+			<div>
+				<input type="password" placeholder="Confirm your password" required="" name="confirm" id="confirm" onkeyup="checkPass(); return false;" />
+				<p>
+				<span id="confirmMessage" class="confirmMessage"></span>
+			</div>
+			<div>
+				<input type="submit" value="회원가입" />
+			</div>
+		</form><!-- form -->
+		
+	</section><!-- content -->
+</div><!-- container -->
+</body>
+</html>
+

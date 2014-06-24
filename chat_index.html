@@ -1,0 +1,376 @@
+<link rel="stylesheet" href="/chat/farbtastic.css" />
+<link rel="stylesheet" href="/chat/css/ui-lightness/jquery-ui-1.8.16.custom.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="/chat/js/jquery-ui-1.8.16.custom.min.js "></script>
+<script src="/chat/farbtastic.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script type="text/javascript">
+$(function(){
+	$("ul.panel li:not("+$("ul.tab li a.selected").attr("href")+")").hide();
+	$("ul.tab li a").click(function(){
+		$("ul.tab li a").removeClass("selected");
+		$(this).addClass("selected");
+		$("ul.panel li").slideUp("fast");
+		$($(this).attr("href")).slideDown("fast");
+		return false;
+	});
+});
+		</script>
+
+
+<script>
+	function Point(event, target){
+		this.x = event.pageX - $(target).position().left;
+		this.y = event.pageY - $(target).position().top;
+	}
+</script>
+
+
+<script>
+	var socket = io.connect('http://54.199.156.254:52276');
+	socket.on('connect', function(){
+	});
+
+	socket.on('updatechat', function (username, data) {
+		if(username == "SERVER")
+		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+		else
+		$('#conversation').append('->'+data + '<br>');
+	});
+
+
+
+	$(function(){
+		$('#datasend').click( function() {
+			var message = $('#data').val();
+			$('#data').val('');
+			socket.emit('sendchat', message);
+		});
+
+		$('#data').keypress(function(e) {
+			if(e.which == 13) {
+				$(this).blur();
+				$('#datasend').focus().click();
+			}
+		});
+	});
+	
+	$(document).ready(function () {
+		var canvas = document.getElementById('canvas');
+		var context = canvas.getContext('2d');
+
+		var width = 5;
+		var color = '#000000';
+		var isDown = false;
+		var newPoint, oldPoint;
+		
+		var colorRed = '#FF0000';
+		var colorBlack = '#000000';
+		var colorBlue = '#0A00E5';
+		var colorBrown = '#5C3828';
+		var colorGray = '#7F7F7F';
+		var colorGreen = '#2BAD4B';
+		var colorOrange = '#FF7E21';
+		var colorPurple = '#7D027E';
+		var colorWhite = '#FFFFFF';
+		var colorYellow = '#FFF004';
+		var btnEraser = '#FFFFFF';
+
+		canvas.onmousedown = function (event) {
+			isDown = true;
+			oldPoint = new Point(event, this);
+	         };
+        	canvas.onmouseup = function () { isDown = false; };
+	        canvas.onmousemove = function (event) {
+	     		if (isDown) {
+	                	newPoint = new Point(event, this);
+	              		socket.emit('draw', {
+					width: width,
+					color: color,
+					x1: oldPoint.x,
+					y1: oldPoint.y,
+					x2: newPoint.x,
+					y2: newPoint.y
+				});
+				oldPoint = newPoint;
+                	}
+            	};
+		var btn_red = document.getElementById("red");
+		var btn_black = document.getElementById("black");
+		var btn_blue = document.getElementById("blue");
+		var btn_brown = document.getElementById("brown");
+		var btn_gray = document.getElementById("gray");
+		var btn_green = document.getElementById("green");
+		var btn_orange = document.getElementById("orange");
+		var btn_purple = document.getElementById("purple");
+		var btn_white = document.getElementById("white");
+		var btn_yellow = document.getElementById("yellow");
+
+		var btn_small = document.getElementById("small");
+		var btn_normal = document.getElementById("normal");
+		var btn_big = document.getElementById("big");
+		var btn_eraser = document.getElementById("eraser");
+
+		btn_red.onclick = btnRedClick;
+		function btnRedClick(e){
+			color = colorRed;
+		};
+		btn_black.onclick = btnBlackClick;
+		function btnBlackClick(e){
+			color = colorBlack;
+		};
+		btn_blue.onclick = btnBlueClick;
+		function btnBlueClick(e){
+			color = colorBlue;
+		};
+		btn_brown.onclick = btnBrownClick;
+		function btnBrownClick(e){
+			color = colorBrown;
+		};
+		btn_gray.onclick = btnGrayClick;
+		function btnGrayClick(e){
+			color = colorGray;
+		};
+		btn_green.onclick = btnGreenClick;
+		function btnGreenClick(e){
+			color = colorGreen;
+		};
+		btn_orange.onclick = btnOrangeClick;
+		function btnOrangeClick(e){
+			color = colorOrange;
+		};
+		btn_purple.onclick = btnPurpleClick;
+		function btnPurpleClick(e){
+			color = colorPurple;
+		};
+                btn_white.onclick = btnWhiteClick;
+		function btnWhiteClick(e){
+			color = colorWhite;
+		};
+                btn_yellow.onclick = btnYellowClick;
+		function btnYellowClick(e){
+			color = colorYellow;
+		};
+		btn_small.onclick = btnSmallClick;
+		function btnSmallClick(e){
+			width = 1;
+		};
+		btn_normal.onclick = btnNormalClick;
+		function btnNormalClick(e){
+			width = 5;
+		};
+		btn_big.onclick = btnBigClick;
+		function btnBigClick(e){
+			width = 10;
+		};
+		btn_eraser.onclick = btnEraserClick;
+		function btnEraserClick(e){
+			width = 20;
+			color = colorWhite;
+		};
+		
+		socket.on('line', function (data) {
+			context.lineWidth = data.width;
+			context.strokeStyle = data.color;
+	                context.beginPath();
+	                context.moveTo(data.x1, data.y1);
+        	        context.lineTo(data.x2, data.y2);
+	                context.stroke();
+        	 });
+        });
+</script>
+
+<style type="text/css">
+*{
+	margin:0;
+	padding:0;
+}
+#container{
+	width:500px;
+	margin:0px auto;
+}
+ul.tab{
+	padding:0;
+}
+ul.tab li{
+	list-style-type:none;
+	width:100px;
+	height:40px;
+	float:left;
+}
+ul.tab li a{
+	outline:none;
+	background:url("http://cfile25.uf.tistory.com/image/17710F454FEE42C1326F65");
+	display:block;
+	color:blue;
+	line-height:40px;
+	text-align:center;
+}
+ul.tab li a.selected{
+	background:url("http://cfile7.uf.tistory.com/image/18710F454FEE42C133F20E");
+	text-decoration:none;
+	color:#333;
+	cursor:default;
+}
+ul.panel{
+	clear:both;
+	
+	padding:0;
+}
+ul.panel li{
+	list-style-type:none;
+	padding:10px;
+	text-indent:1em;
+	color:#333;
+}
+input.red_btn{
+	background: url(images/chat/btn_red.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.black_btn{
+        background: url(images/chat/btn_black.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.blue_btn{
+	background: url(images/chat/btn_blue.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.brown_btn{
+	background: url(images/chat/btn_brown.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.gray_btn{
+	background: url(images/chat/btn_gray.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.green_btn{
+	background: url(images/chat/btn_green.jpg) no-repeat;	
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.orange_btn{
+	background: url(images/chat/btn_orange.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.purple_btn{
+	background: url(images/chat/btn_purple.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.white_btn{
+	background: url(images/chat/btn_white.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.yellow_btn{
+	background: url(images/chat/btn_yellow.jpg) no-repeat;
+	border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.small_btn{
+	background: url(images/chat/btn_small.jpg) no-repeat;
+        border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.normal_btn{
+	background: url(images/chat/btn_normal.jpg) no-repeat;
+        border: none;
+        width: 24px;
+        height: 24px;
+}
+input.big_btn{
+        cursor: pointer;background: url(images/chat/btn_big.jpg) no-repeat;
+        border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.eraser_btn{
+	background: url(images/chat/btn_eraser.jpg) no-repeat;
+        border: none;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+}
+input.datasend{
+	background: url(images/chat/btn_submit.jpg) no-repeat;
+	border: none;
+	width: 51px;
+	height: 44px;
+	cursor: pointer;
+}
+
+		</style>
+
+<div id="container">
+	<ul class="tab">
+		<li><a href="#tab1" class="selected">TextChat</a></li>
+		<li><a href="#tab2">Drawing</a></li>
+	</ul>
+	<ul class="panel">
+		<li id="tab1">
+
+<div id="test" style="float:left; width:450px; height:450px; overflow-y:scroll; padding:10px;">
+	<div id="conversation"></div>
+</div>
+
+<input id="data" style="width:400px; height:75px;" >
+<input type="button" id="datasend" class="datasend" style="padding:18px;" />
+
+
+</li>
+	<li id="tab2">
+	<canvas id="canvas" width="450" height="440" style="position:absolute; display:block; top:20%; border-top:1px groove; border-left:1px groove; border-bottom:1px groove; border-right:1px groove;"></canvas>
+	
+	<input class="black_btn" id="black" type="button"></input>
+	<input class="red_btn" id="red" type="button"></input>
+	<input class="blue_btn" id="blue" type="button"></input>
+	<input class="brown_btn" id="brown" type="button"></input>
+	<input class="gray_btn" id="gray" type="button"></input>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input class="small_btn" id="small" type="button"></input>
+	<input class="normal_btn" id="normal" type="button"></input>
+	<br>&nbsp;&nbsp;
+	<input class="green_btn" id="green" type="button"></input>
+	<input class="orange_btn" id="orange" type="button"></input>
+	<input class="purple_btn" id="purple" type="button"></input>
+	<input class="white_btn" id="white" type="button"></input>
+	<input class="yellow_btn" id="yellow" type="button"></input>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input class="big_btn" id="big" type="button"></input>
+	<input class="eraser_btn" id="eraser" type="button"></input>
+
+	</li>
+	</ul>
+	</div>
+
